@@ -113,6 +113,19 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         // It also adds a button to the map that, when tapped, centers the map on the user's location.
         mMap.setMyLocationEnabled(true);
 
+        // displays a more detailed view of the area, showing changes in elevation:
+        //mMap.setMapType(GoogleMap.MAP_TYPE_TERRAIN);
+
+        // displays a satellite view of an area with no labels
+        //mMap.setMapType(GoogleMap.MAP_TYPE_SATELLITE);
+
+        // displays a combination of the satellite and normal mode
+        //mMap.setMapType(GoogleMap.MAP_TYPE_HYBRID);
+
+
+        // displays a a typical road map with labels. this is default type
+        mMap.setMapType(GoogleMap.MAP_TYPE_NORMAL);
+
 
         // 2
         // determines the availability of location data on the device.
