@@ -2,7 +2,8 @@ package com.hanthienduc.cityguide;
 
 import android.Manifest;
 import android.content.pm.PackageManager;
-import android.graphics.BitmapFactory;
+import android.location.Address;
+import android.location.Geocoder;
 import android.location.Location;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -23,6 +24,9 @@ import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
+
+import java.io.IOException;
+import java.util.List;
 
 ;
 
@@ -72,16 +76,18 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         mMap = googleMap;
 
         // Add a marker in Sydney and move the camera
-        LatLng sydney = new LatLng(-34, 151);
+        /*LatLng sydney = new LatLng(-34, 151);
         mMap.addMarker(new MarkerOptions().position(sydney).title("Marker in Sydney"));
         mMap.moveCamera(CameraUpdateFactory.newLatLng(sydney));
         mMap.getUiSettings().setZoomControlsEnabled(true);
-        mMap.setOnMarkerClickListener(this);
+        mMap.setOnMarkerClickListener(this);*/
 
         // Add a marker in Ho Chi city and move the camera
         LatLng mPlace = new LatLng(10.762622, 106.660172);
         mMap.addMarker(new MarkerOptions().position(mPlace).title("Ho Chi minh City"));
         mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(mPlace, 12)); // zoom level up to 20
+        mMap.getUiSettings().setZoomControlsEnabled(true);
+        mMap.setOnMarkerClickListener(this);
     }
 
 
@@ -120,11 +126,11 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         //mMap.setMapType(GoogleMap.MAP_TYPE_SATELLITE);
 
         // displays a combination of the satellite and normal mode
-        //mMap.setMapType(GoogleMap.MAP_TYPE_HYBRID);
+        mMap.setMapType(GoogleMap.MAP_TYPE_HYBRID);
 
 
         // displays a a typical road map with labels. this is default type
-        mMap.setMapType(GoogleMap.MAP_TYPE_NORMAL);
+        //mMap.setMapType(GoogleMap.MAP_TYPE_NORMAL);
 
 
         // 2
@@ -150,21 +156,51 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     }
 
     // a marker object. which is an icon that can be placed at a particular point on the map's surface.
-    protected void placeMarkerOnMap(LatLng location){
+    protected void placeMarkerOnMap(LatLng location) {
         // 1
         // Create a MarkerOptions object and sets the user's current location as the position for the marker
         MarkerOptions markerOptions = new MarkerOptions().position(location);
 
         // a custom icon as the pin.
-        markerOptions.icon(BitmapDescriptorFactory.fromBitmap(BitmapFactory.decodeResource
-                (getResources(),R.mipmap.ic_user_location)));
+        /*markerOptions.icon(BitmapDescriptorFactory.fromBitmap(BitmapFactory.decodeResource
+                (getResources(), R.mipmap.ic_user_location)));*/
 
         // default pin but in a different color
-        //markerOptions.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE));
+        markerOptions.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE));
+
+        String titleStr = getAddress(location);
+        markerOptions.title(titleStr);
 
         // 2
         // Add the marker to the map
         mMap.addMarker(markerOptions);
+    }
+
+    /*
+        1. Creates a Geocoder object to turn a latitude and longtitude coordinate into an address and vice versa.
+        2. Asks th geocoder to get the address from the location passed to the method.
+        3. if the response contains any address, then append it to a string and return.
+     */
+    private String getAddress(LatLng latLng) {
+        // 1
+        Geocoder geocoder = new Geocoder(this);
+        String addressText = "";
+        List<Address> addresses = null;
+        Address address = null;
+        try {
+            // 2
+            addresses = geocoder.getFromLocation(latLng.latitude, latLng.longitude, 1);
+            //3
+            if (null != addresses && !addresses.isEmpty()) {
+                address = addresses.get(0);
+                for (int i = 0; i < address.getMaxAddressLineIndex(); i++) {
+                    addressText += (i == 0) ? address.getAddressLine(i) : ("\n" + address.getAddressLine(i));
+                }
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return addressText;
     }
 
     @Override
