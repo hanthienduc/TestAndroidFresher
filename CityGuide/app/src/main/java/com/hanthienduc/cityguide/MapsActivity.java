@@ -10,10 +10,14 @@ import android.location.Location;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentActivity;
+import android.view.View;
 
 import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.GooglePlayServicesNotAvailableException;
+import com.google.android.gms.common.GooglePlayServicesRepairableException;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.common.api.PendingResult;
 import com.google.android.gms.common.api.ResultCallback;
@@ -25,6 +29,8 @@ import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.location.LocationSettingsRequest;
 import com.google.android.gms.location.LocationSettingsResult;
 import com.google.android.gms.location.LocationSettingsStatusCodes;
+import com.google.android.gms.location.places.Place;
+import com.google.android.gms.location.places.ui.PlacePicker;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
@@ -60,6 +66,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     // REQUEST_CHECK_SETTINGS is used as the request code passed to onActivityResult.
     private static final int REQUEST_CHECK_SETTINGS = 2;
 
+    private static final int PLACE_PICKER_REQUEST = 3;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -79,6 +87,14 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         }
 
         createLocationRequest();
+
+        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
+        fab.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                loadPlacePicker();
+            }
+        });
     }
 
 
@@ -299,6 +315,17 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         });
     }
 
+    // this method creates a new builder for an intent to start the Place Picker UI and the starts the
+    /// PlacePicker intent
+    private void loadPlacePicker() {
+        PlacePicker.IntentBuilder intentBuilder = new PlacePicker.IntentBuilder();
+        try {
+            startActivityForResult(intentBuilder.build(MapsActivity.this), PLACE_PICKER_REQUEST);
+        } catch (GooglePlayServicesRepairableException | GooglePlayServicesNotAvailableException e) {
+            e.printStackTrace();
+        }
+    }
+
     // Override FragmentActivity's onActivityResult() method and start the update request if it has a
     // RESULT_OK result for a REQUEST_CHECK_SETTINGS request.
     @Override
@@ -308,6 +335,19 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             if (resultCode == RESULT_OK) {
                 mLocationUpdateState = true;
                 startLocationUpdates();
+            }
+        }
+
+        // Here you receive details about the selected place if it has a RESULT_OK result for a PLACE_PICKER_REQUEST
+        // request, and then place a marker on that position on the map
+
+        if (requestCode == PLACE_PICKER_REQUEST) {
+            if (resultCode == RESULT_OK) {
+                Place place = PlacePicker.getPlace(this, data);
+                String addressText = place.getName().toString();
+                addressText += "\n" + place.getAddress().toString();
+
+                placeMarkerOnMap(place.getLatLng());
             }
         }
     }
