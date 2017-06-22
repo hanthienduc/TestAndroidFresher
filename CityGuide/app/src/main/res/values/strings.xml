@@ -1,0 +1,5 @@
+ <resources>
+    <string name="app_name">City Guide</string>
+    <string name="title_activity_maps">Map</string>
+     <string name="my_google_maps_api_key">AIzaSyAIa_0KMqBmCFj6ScojssquB6v0XgASiHI</string>
+</resources>
