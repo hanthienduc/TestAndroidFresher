@@ -15,5 +15,12 @@
         android:layout_height="wrap_content"
         android:text="@string/activity_main_btn_add_user" />
 
+    <Button
+        android:id="@+id/btn_show_alert"
+        style="@style/Widget.AppCompat.Button.Colored"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/activity_main_btn_show_success" />
+
 
 </LinearLayout>

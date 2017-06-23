@@ -32,6 +32,14 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
+
+        Button showAlertButton = (Button) findViewById(R.id.btn_show_alert);
+        showAlertButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                showAlertDialog();
+            }
+        });
     }
 
     private void showAddUserDialog() {
@@ -55,5 +63,12 @@ public class MainActivity extends AppCompatActivity {
 
     private void addUserSuccess(String userName) {
         Snackbar.make(coordinatorlayout, userName + " has been added", Snackbar.LENGTH_SHORT).show();
+    }
+
+    private void showAlertDialog() {
+        new SwipeDismissDialog.Builder(this)
+                .setLayoutResId(R.layout.dialog_success_booking)
+                .build()
+                .show();
     }
 }
